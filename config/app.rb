@@ -4,6 +4,7 @@ require 'sinatra/base'
 require 'sinatra/url_for'
 require 'better_errors'
 require 'rdiscount'
+require_relative '../lib/asset_bundler'
 require 'erb'
 
 class App < Sinatra::Base
@@ -12,6 +13,31 @@ class App < Sinatra::Base
     set :views, VIEWS_PATH
     set :components, COMPONENTS_PATH
     set :public_folder, PUBLIC_PATH
+    set :asset_bundler, AssetBundler.new
+
+    # JavaScript group
+    settings.asset_bundler.add_js(:tailwind, paths: [
+                                    [File.join(APP_ROOT, 'assets/js/tailwind.min.js'), false]
+                                  ])
+
+    # CSS group
+    settings.asset_bundler.add_css(:base, paths: [
+                                     [File.join(APP_ROOT, 'assets/style/main.css'), true]
+                                   ])
+  end
+
+  # Serve JavaScript bundles dynamically
+  get '/assets/:group.js' do |group|
+    bundler = settings.asset_bundler
+    content_type 'application/javascript'
+    bundler.bundle_js(group.to_sym)
+  end
+
+  # Serve JavaScript bundles dynamically
+  get '/assets/:group.css' do |group|
+    bundler = settings.asset_bundler
+    content_type 'text/css'
+    bundler.bundle_css(group.to_sym)
   end
 
   # Just in development!

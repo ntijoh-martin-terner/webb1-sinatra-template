@@ -19,3 +19,9 @@ group :development do
 end
 
 gem 'rdiscount', '~> 2.2'
+
+gem 'yui-compressor', '~> 0.12.0'
+
+gem 'terser', '~> 1.2'
+
+gem 'sassc', '~> 2.4'
